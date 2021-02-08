@@ -19,30 +19,37 @@ class PlacesListScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: Consumer<GreatPlaces>(
-        child: Text('No Places Yet! Add Some.'),
-        builder: (context, places, ch) => places.items.length <= 0
-            ? ch
-            : ListView.builder(
-                itemCount: places.items.length,
-                itemBuilder: (ctx, i) => Container(
-                  child: Column(
-                    children: [
-                      ListTile(
-                        leading: CircleAvatar(
-                          backgroundImage: FileImage(
-                            places.items[i].image,
+      body: FutureBuilder(
+        future: Provider.of<GreatPlaces>(context, listen: false)
+            .fetchAndSetPlaces(),
+        builder: (ctx, snapshot) =>
+            snapshot.connectionState == ConnectionState.waiting
+                ? Center(child: CircularProgressIndicator())
+                : Consumer<GreatPlaces>(
+                    child: Text('No Places Yet! Add Some.'),
+                    builder: (context, places, ch) => places.items.length <= 0
+                        ? ch
+                        : ListView.builder(
+                            itemCount: places.items.length,
+                            itemBuilder: (ctx, i) => Container(
+                              child: Column(
+                                children: [
+                                  ListTile(
+                                    leading: CircleAvatar(
+                                      backgroundImage: FileImage(
+                                        places.items[i].image,
+                                      ),
+                                    ),
+                                    title: Text(places.items[i].title),
+                                  ),
+                                  Divider(
+                                    thickness: 1,
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
-                        ),
-                        title: Text(places.items[i].title),
-                      ),
-                      Divider(
-                        thickness: 1,
-                      ),
-                    ],
                   ),
-                ),
-              ),
       ),
     );
   }
