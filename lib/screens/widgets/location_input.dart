@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 
+import '../../models/place.dart';
+import '../map_screen/map_screen.dart';
+
 import '../../secrets.dart';
 
 class LocationInput extends StatefulWidget {
@@ -29,10 +32,28 @@ class _LocationInputState extends State<LocationInput> {
       _permissionStatus = await location.requestPermission();
       if (_permissionStatus == PermissionStatus.denied) return;
     }
-
     _locationData = await location.getLocation();
-    _previewImageUrl =
-        'https://maps.googleapis.com/maps/api/staticmap?center=${_locationData.latitude},${_locationData.longitude}&zoom=12&size=400x400&markers=color:red%7Clabel:C%7C${_locationData.latitude},${_locationData.longitude}&key=$API_KEY_GOOGLE';
+    setState(() {
+      _previewImageUrl =
+          'https://www.mapquestapi.com/staticmap/v5/map?key=$MAP_QUEST_API_KEY&locations=${_locationData.latitude},${_locationData.longitude}&zoom=16';
+    });
+  }
+
+  Future<void> _selectOnMap() async {
+    final PlaceLocation selectedLocation = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (ctx) => MapScreen(
+          isSelecting: true,
+        ),
+        fullscreenDialog: true,
+      ),
+    );
+
+    if (selectedLocation == null) return;
+    setState(() {
+      _previewImageUrl =
+          'https://www.mapquestapi.com/staticmap/v5/map?key=$MAP_QUEST_API_KEY&locations=${selectedLocation.latitude},${selectedLocation.longitude}&zoom=16';
+    });
   }
 
   @override
@@ -72,7 +93,7 @@ class _LocationInputState extends State<LocationInput> {
               textColor: Theme.of(context).primaryColor,
               icon: Icon(Icons.map),
               label: Text('Select on map'),
-              onPressed: () {},
+              onPressed: _selectOnMap,
             ),
           ],
         ),
