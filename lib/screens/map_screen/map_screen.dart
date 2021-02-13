@@ -32,16 +32,13 @@ class _MapScreenState extends State<MapScreen> {
       appBar: AppBar(
         title: Text('Map'),
         actions: [
-          IconButton(
-            icon: Icon(Icons.check),
-            onPressed: () {
-              Navigator.of(context).pop(
-                PlaceLocation(
-                    latitude: _pickedLocation.latitude,
-                    longitude: _pickedLocation.longitude),
-              );
-            },
-          ),
+          if (widget.isSelecting)
+            IconButton(
+              icon: Icon(Icons.check),
+              onPressed: () {
+                Navigator.of(context).pop(_pickedLocation);
+              },
+            ),
         ],
       ),
       body: GoogleMap(

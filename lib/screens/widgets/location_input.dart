@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 
-import '../../models/place.dart';
 import '../map_screen/map_screen.dart';
-
-import '../../secrets.dart';
+import '../../helpers/location_helper.dart';
 
 class LocationInput extends StatefulWidget {
+  final Function selectLocation;
+  LocationInput(this.selectLocation);
   @override
   _LocationInputState createState() => _LocationInputState();
 }
@@ -33,14 +34,16 @@ class _LocationInputState extends State<LocationInput> {
       if (_permissionStatus == PermissionStatus.denied) return;
     }
     _locationData = await location.getLocation();
+    if (_locationData == null) return;
+    widget.selectLocation(_locationData.latitude, _locationData.longitude);
     setState(() {
-      _previewImageUrl =
-          'https://www.mapquestapi.com/staticmap/v5/map?key=$MAP_QUEST_API_KEY&locations=${_locationData.latitude},${_locationData.longitude}&zoom=16';
+      _previewImageUrl = LocationHelper.getStaticImageUrl(
+          _locationData.latitude, _locationData.longitude);
     });
   }
 
   Future<void> _selectOnMap() async {
-    final PlaceLocation selectedLocation = await Navigator.of(context).push(
+    final LatLng selectedLocation = await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (ctx) => MapScreen(
           isSelecting: true,
@@ -50,9 +53,11 @@ class _LocationInputState extends State<LocationInput> {
     );
 
     if (selectedLocation == null) return;
+    widget.selectLocation(
+        selectedLocation.latitude, selectedLocation.longitude);
     setState(() {
-      _previewImageUrl =
-          'https://www.mapquestapi.com/staticmap/v5/map?key=$MAP_QUEST_API_KEY&locations=${selectedLocation.latitude},${selectedLocation.longitude}&zoom=16';
+      _previewImageUrl = LocationHelper.getStaticImageUrl(
+          selectedLocation.latitude, selectedLocation.longitude);
     });
   }
 

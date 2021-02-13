@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../add_place_screen/add_place_screen.dart';
+import '../place_detail_screen/place_detail_screen.dart';
 import '../../providers/great_places.dart';
 
 class PlacesListScreen extends StatelessWidget {
@@ -31,25 +32,52 @@ class PlacesListScreen extends StatelessWidget {
                         ? ch
                         : ListView.builder(
                             itemCount: places.items.length,
-                            itemBuilder: (ctx, i) => Container(
-                              child: Column(
-                                children: [
-                                  ListTile(
-                                    leading: CircleAvatar(
-                                      backgroundImage: FileImage(
-                                        places.items[i].image,
-                                      ),
-                                    ),
-                                    title: Text(places.items[i].title),
-                                  ),
-                                  Divider(
-                                    thickness: 1,
-                                  ),
-                                ],
+                            itemBuilder: (ctx, i) => Dismissible(
+                              key: ValueKey(places.items[i].id),
+                              direction: DismissDirection.endToStart,
+                              background: Container(
+                                alignment: Alignment.centerRight,
+                                color: Colors.red,
+                                padding: EdgeInsets.only(right: 10),
+                                child: Icon(
+                                  Icons.delete_forever,
+                                  size: 30,
+                                ),
                               ),
+                              child: buildPlacesListItem(context, i, places),
                             ),
                           ),
                   ),
+      ),
+    );
+  }
+
+  GestureDetector buildPlacesListItem(
+      BuildContext context, int i, GreatPlaces places) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context)
+            .push(MaterialPageRoute(builder: (_) => PlaceDetailScreen(i)));
+      },
+      child: Container(
+        margin: EdgeInsets.only(top: 10),
+        child: Column(
+          children: [
+            ListTile(
+              leading: CircleAvatar(
+                backgroundImage: FileImage(
+                  places.items[i].image,
+                ),
+              ),
+              title: Text(places.items[i].title),
+              subtitle: Text(places.items[i].location.address),
+            ),
+            Divider(
+              height: 1,
+              thickness: 1,
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../widgets/image_input.dart';
 import '../../providers/great_places.dart';
 import '../widgets/location_input.dart';
+import '../../models/place.dart';
 
 class AddPlaceScreen extends StatefulWidget {
   static const routeName = '/add-place';
@@ -16,15 +17,29 @@ class AddPlaceScreen extends StatefulWidget {
 class _AddPlaceScreenState extends State<AddPlaceScreen> {
   final _titleController = TextEditingController();
   File _selectedImage;
+  PlaceLocation _selectedLocation;
+  bool _addingPlace = false;
 
   void _selectImage(File image) {
     _selectedImage = image;
   }
 
-  void addPlace() {
-    if (_titleController.text.length < 5 || _selectedImage == null) return;
-    Provider.of<GreatPlaces>(context, listen: false)
-        .addPlace(_titleController.text, _selectedImage);
+  void _selectLocation(double lat, double lng) {
+    _selectedLocation = PlaceLocation(latitude: lat, longitude: lng);
+  }
+
+  Future<void> addPlace() async {
+    if (_titleController.text.length < 5 ||
+        _selectedImage == null ||
+        _selectedLocation == null) return;
+    setState(() {
+      _addingPlace = true;
+    });
+    await Provider.of<GreatPlaces>(context, listen: false)
+        .addPlace(_titleController.text, _selectedImage, _selectedLocation);
+    setState(() {
+      _addingPlace = false;
+    });
     Navigator.of(context).pop();
   }
 
@@ -35,7 +50,9 @@ class _AddPlaceScreenState extends State<AddPlaceScreen> {
         title: Text('Add Place'),
       ),
       body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+        crossAxisAlignment: _addingPlace
+            ? CrossAxisAlignment.center
+            : CrossAxisAlignment.stretch,
         children: [
           Expanded(
             child: Padding(
@@ -49,19 +66,21 @@ class _AddPlaceScreenState extends State<AddPlaceScreen> {
                   SizedBox(height: 10),
                   ImageInput(_selectImage),
                   SizedBox(height: 10),
-                  LocationInput(),
+                  LocationInput(_selectLocation),
                 ],
               ),
             ),
           ),
-          RaisedButton.icon(
-            label: Text('Add'),
-            icon: Icon(Icons.add),
-            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            color: Theme.of(context).accentColor,
-            elevation: 0,
-            onPressed: addPlace,
-          )
+          _addingPlace
+              ? CircularProgressIndicator()
+              : RaisedButton.icon(
+                  label: Text('Add'),
+                  icon: Icon(Icons.add),
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  color: Theme.of(context).accentColor,
+                  elevation: 0,
+                  onPressed: addPlace,
+                )
         ],
       ),
     );
