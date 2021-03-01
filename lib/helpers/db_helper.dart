@@ -24,4 +24,10 @@ class DBHelper {
     final db = await DBHelper.getDatabase();
     return db.query(table);
   }
+
+  static Future<bool> deletePlace(String table, String id) async {
+    final db = await DBHelper.getDatabase();
+    final count = await db.delete(table, where: 'id = ?', whereArgs: [id]);
+    return count > 0 ? true : false;
+  }
 }

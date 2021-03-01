@@ -16,8 +16,11 @@ class PlaceDetailScreen extends StatelessWidget {
       ),
       body: Container(
         child: Column(
+          // crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
+              height: 250,
+              width: double.infinity,
               decoration: BoxDecoration(
                 border: Border.all(
                   width: 1,
@@ -31,11 +34,16 @@ class PlaceDetailScreen extends StatelessWidget {
                 },
                 child: Image.file(
                   place.image,
-                  fit: BoxFit.scaleDown,
-                  height: 200,
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
+            SizedBox(height: 10),
+            Text(
+              place.location.address,
+              style: TextStyle(fontSize: 20, color: Colors.grey),
+              textAlign: TextAlign.center,
+            )
           ],
         ),
       ),

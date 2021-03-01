@@ -45,16 +45,28 @@ class GreatPlaces with ChangeNotifier {
     });
   }
 
+  Future<void> deletePlace(String id) async {
+    await DBHelper.deletePlace('user_places', id);
+    _items.removeWhere((element) => element.id == id);
+    notifyListeners();
+  }
+
+  Place findById(String id) {
+    return _items.firstWhere((element) => element.id == id);
+  }
+
   Future<void> fetchAndSetPlaces() async {
     final data = await DBHelper.getData('user_places');
     _items = [];
     if (data == null) return;
-    data.forEach((element) {
+    data.forEach((element) async {
+      File image = File(element['image']);
+      if (!image.existsSync()) image = null;
       _items.add(
         Place(
           id: element['id'],
           title: element['title'],
-          image: File(element['image']),
+          image: image,
           location: PlaceLocation(
             latitude: element['loc_lat'],
             longitude: element['loc_lng'],

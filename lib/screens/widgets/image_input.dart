@@ -5,6 +5,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:path/path.dart' as path;
 
+import '../image_full_screen/image_full_screen.dart';
+
 class ImageInput extends StatefulWidget {
   final Function onSelectImage;
   ImageInput(this.onSelectImage);
@@ -18,17 +20,31 @@ class _ImageInputState extends State<ImageInput> {
 
   Future<void> pickImage() async {
     final pickedImage = await _imagePicker.getImage(
+      preferredCameraDevice: CameraDevice.rear,
       source: ImageSource.camera,
-      maxHeight: 600,
-      maxWidth: 600.0,
+      maxHeight: 1280.0,
+      maxWidth: 720.0,
     );
     if (pickedImage == null) return;
+    if (_storedImage != null && await _storedImage.exists()) {
+      debugPrint('EXISTS!');
+      try {
+        await _storedImage.delete();
+      } catch (e) {
+        debugPrint(e.toString());
+      }
+    }
     setState(() {
       _storedImage = File(pickedImage.path);
     });
     final appDir = await path_provider.getApplicationDocumentsDirectory();
     _storedImage = await _storedImage
         .copy('${appDir.path}/${path.basename(_storedImage.path)}');
+    // try {
+    //   await File(pickedImage.path).delete();
+    // } catch (e) {
+    //   debugPrint(e);
+    // }
     widget.onSelectImage(_storedImage);
   }
 
@@ -51,10 +67,16 @@ class _ImageInputState extends State<ImageInput> {
                   'No Image Selected',
                   textAlign: TextAlign.center,
                 )
-              : Image.file(
-                  _storedImage,
-                  fit: BoxFit.cover,
-                  width: double.infinity,
+              : GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (ctx) => ImageFullScreen(_storedImage)));
+                  },
+                  child: Image.file(
+                    _storedImage,
+                    fit: BoxFit.fill,
+                    width: double.infinity,
+                  ),
                 ),
         ),
         SizedBox(width: 10),

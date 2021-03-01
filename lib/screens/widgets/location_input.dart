@@ -14,8 +14,12 @@ class LocationInput extends StatefulWidget {
 
 class _LocationInputState extends State<LocationInput> {
   String _previewImageUrl;
+  bool _selectingLocation = false;
 
   Future<void> _getCurrentUserLocation() async {
+    setState(() {
+      _selectingLocation = true;
+    });
     Location location = Location();
 
     bool _serviceEnabled;
@@ -25,21 +29,32 @@ class _LocationInputState extends State<LocationInput> {
     _serviceEnabled = await location.serviceEnabled();
     if (!_serviceEnabled) {
       location.requestService();
-      if (!_serviceEnabled) return;
+      if (!_serviceEnabled) {
+        _selectingLocation = false;
+        return;
+      }
     }
 
     _permissionStatus = await location.hasPermission();
     if (_permissionStatus == PermissionStatus.denied) {
       _permissionStatus = await location.requestPermission();
-      if (_permissionStatus == PermissionStatus.denied) return;
+      if (_permissionStatus == PermissionStatus.denied) {
+        _selectingLocation = false;
+        return;
+      }
     }
     _locationData = await location.getLocation();
-    if (_locationData == null) return;
-    widget.selectLocation(_locationData.latitude, _locationData.longitude);
+    if (_locationData == null) {
+      _selectingLocation = false;
+      return;
+    }
+    final imageUrl = LocationHelper.getStaticImageUrl(
+        _locationData.latitude, _locationData.longitude);
     setState(() {
-      _previewImageUrl = LocationHelper.getStaticImageUrl(
-          _locationData.latitude, _locationData.longitude);
+      _previewImageUrl = imageUrl;
+      _selectingLocation = false;
     });
+    widget.selectLocation(_locationData.latitude, _locationData.longitude);
   }
 
   Future<void> _selectOnMap() async {
@@ -55,9 +70,11 @@ class _LocationInputState extends State<LocationInput> {
     if (selectedLocation == null) return;
     widget.selectLocation(
         selectedLocation.latitude, selectedLocation.longitude);
+    final imageUrl = LocationHelper.getStaticImageUrl(
+        selectedLocation.latitude, selectedLocation.longitude);
     setState(() {
-      _previewImageUrl = LocationHelper.getStaticImageUrl(
-          selectedLocation.latitude, selectedLocation.longitude);
+      _previewImageUrl = imageUrl;
+      _selectingLocation = false;
     });
   }
 
@@ -72,19 +89,15 @@ class _LocationInputState extends State<LocationInput> {
           alignment: Alignment.center,
           child: _previewImageUrl == null
               ? Text('No Location Added')
-              : Image.network(
-                  _previewImageUrl,
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  loadingBuilder: (_, child, progress) {
-                    return progress == null
-                        ? child
-                        : LinearProgressIndicator(
-                            value: progress.cumulativeBytesLoaded /
-                                progress.expectedTotalBytes,
-                          );
-                  },
-                ),
+              : _selectingLocation
+                  ? CircularProgressIndicator()
+                  : Image.network(_previewImageUrl,
+                      fit: BoxFit.cover, width: double.infinity,
+                      loadingBuilder: (_, child, progress) {
+                      return progress == null
+                          ? child
+                          : LinearProgressIndicator();
+                    }),
         ),
         Row(
           children: [
