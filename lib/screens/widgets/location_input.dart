@@ -87,7 +87,7 @@ class _LocationInputState extends State<LocationInput> {
           height: 170,
           width: double.infinity,
           alignment: Alignment.center,
-          child: _previewImageUrl == null
+          child: _previewImageUrl == null && !_selectingLocation
               ? Text('No Location Added')
               : _selectingLocation
                   ? CircularProgressIndicator()

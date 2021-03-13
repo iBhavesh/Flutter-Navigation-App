@@ -12,8 +12,8 @@ class LocationHelper {
 
   static Future<String> getPlaceAddress(
       double latitude, double longitude) async {
-    final url =
-        "https://revgeocode.search.hereapi.com/v1/revgeocode?at=$latitude%2C$longitude&lang=en-US&apiKey=$HERE_API_KEY";
+    final url = Uri.parse(
+        "https://revgeocode.search.hereapi.com/v1/revgeocode?at=$latitude%2C$longitude&lang=en-US&apiKey=$HERE_API_KEY");
     final response = await http.get(url);
     if (response.body.contains('title')) {
       debugPrint("${response.body}");

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../image_full_screen/image_full_screen.dart';
+import '../map_screen/map_screen.dart';
 import '../../providers/great_places.dart';
 // import '../../models/place.dart';
 
@@ -43,6 +44,19 @@ class PlaceDetailScreen extends StatelessWidget {
               place.location.address,
               style: TextStyle(fontSize: 20, color: Colors.grey),
               textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 10),
+            FlatButton(
+              child: Text('View on map'),
+              textColor: Theme.of(context).primaryColor,
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    fullscreenDialog: true,
+                    builder: (ctx) => MapScreen(
+                          initialLocation: place.location,
+                          isSelecting: false,
+                        )));
+              },
             )
           ],
         ),
