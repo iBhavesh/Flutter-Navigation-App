@@ -16,7 +16,7 @@ class GreatPlaces with ChangeNotifier {
   Future<void> addPlace(
       String title, File image, PlaceLocation location) async {
     final address = await LocationHelper.getPlaceAddress(
-        location.latitude, location.longitude);
+        location.latitude!, location.longitude!);
 
     final updatedLocation = PlaceLocation(
         latitude: location.latitude,
@@ -36,12 +36,12 @@ class GreatPlaces with ChangeNotifier {
     //     '${place.location.latitude},${place.location.longitude},${place.location.address}');
 
     return DBHelper.insert('user_places', {
-      'id': place.id,
-      'title': place.title,
-      'image': place.image.path,
-      'loc_lat': place.location.latitude,
-      'loc_lng': place.location.longitude,
-      'address': place.location.address,
+      'id': place.id!,
+      'title': place.title!,
+      'image': place.image!.path,
+      'loc_lat': place.location!.latitude!,
+      'loc_lng': place.location!.longitude!,
+      'address': place.location!.address!,
     });
   }
 
@@ -60,13 +60,13 @@ class GreatPlaces with ChangeNotifier {
     _items = [];
     if (data == null) return;
     data.forEach((element) async {
-      File image = File(element['image']);
+      File? image = File(element['image']);
       if (!image.existsSync()) image = null;
       _items.add(
         Place(
           id: element['id'],
           title: element['title'],
-          image: image,
+          image: image!,
           location: PlaceLocation(
             latitude: element['loc_lat'],
             longitude: element['loc_lng'],

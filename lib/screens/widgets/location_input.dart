@@ -13,7 +13,7 @@ class LocationInput extends StatefulWidget {
 }
 
 class _LocationInputState extends State<LocationInput> {
-  String _previewImageUrl;
+  String? _previewImageUrl;
   bool _selectingLocation = false;
 
   Future<void> _getCurrentUserLocation() async {
@@ -44,12 +44,9 @@ class _LocationInputState extends State<LocationInput> {
       }
     }
     _locationData = await location.getLocation();
-    if (_locationData == null) {
-      _selectingLocation = false;
-      return;
-    }
+
     final imageUrl = LocationHelper.getStaticImageUrl(
-        _locationData.latitude, _locationData.longitude);
+        _locationData.latitude!, _locationData.longitude!);
     setState(() {
       _previewImageUrl = imageUrl;
       _selectingLocation = false;
@@ -58,7 +55,7 @@ class _LocationInputState extends State<LocationInput> {
   }
 
   Future<void> _selectOnMap() async {
-    final LatLng selectedLocation = await Navigator.of(context).push(
+    final LatLng? selectedLocation = await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (ctx) => MapScreen(
           isSelecting: true,
@@ -91,7 +88,7 @@ class _LocationInputState extends State<LocationInput> {
               ? Text('No Location Added')
               : _selectingLocation
                   ? CircularProgressIndicator()
-                  : Image.network(_previewImageUrl,
+                  : Image.network(_previewImageUrl!,
                       fit: BoxFit.cover, width: double.infinity,
                       loadingBuilder: (_, child, progress) {
                       return progress == null

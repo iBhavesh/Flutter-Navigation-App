@@ -15,7 +15,7 @@ class ImageInput extends StatefulWidget {
 }
 
 class _ImageInputState extends State<ImageInput> {
-  File _storedImage;
+  File? _storedImage;
   final _imagePicker = ImagePicker();
 
   Future<void> pickImage() async {
@@ -26,10 +26,10 @@ class _ImageInputState extends State<ImageInput> {
       maxWidth: 720.0,
     );
     if (pickedImage == null) return;
-    if (_storedImage != null && await _storedImage.exists()) {
+    if (_storedImage != null && await _storedImage!.exists()) {
       debugPrint('EXISTS!');
       try {
-        await _storedImage.delete();
+        await _storedImage!.delete();
       } catch (e) {
         debugPrint(e.toString());
       }
@@ -38,8 +38,8 @@ class _ImageInputState extends State<ImageInput> {
       _storedImage = File(pickedImage.path);
     });
     final appDir = await path_provider.getApplicationDocumentsDirectory();
-    _storedImage = await _storedImage
-        .copy('${appDir.path}/${path.basename(_storedImage.path)}');
+    _storedImage = await _storedImage!
+        .copy('${appDir.path}/${path.basename(_storedImage!.path)}');
     // try {
     //   await File(pickedImage.path).delete();
     // } catch (e) {
@@ -70,10 +70,10 @@ class _ImageInputState extends State<ImageInput> {
               : GestureDetector(
                   onTap: () {
                     Navigator.of(context).push(MaterialPageRoute(
-                        builder: (ctx) => ImageFullScreen(_storedImage)));
+                        builder: (ctx) => ImageFullScreen(_storedImage!)));
                   },
                   child: Image.file(
-                    _storedImage,
+                    _storedImage!,
                     fit: BoxFit.fill,
                     width: double.infinity,
                   ),

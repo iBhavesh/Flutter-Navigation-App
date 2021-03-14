@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../helpers/helpers.dart';
 import '../widgets/image_input.dart';
 import '../../providers/great_places.dart';
 import '../widgets/location_input.dart';
@@ -16,8 +17,8 @@ class AddPlaceScreen extends StatefulWidget {
 
 class _AddPlaceScreenState extends State<AddPlaceScreen> {
   final _titleController = TextEditingController();
-  File _selectedImage;
-  PlaceLocation _selectedLocation;
+  File? _selectedImage;
+  PlaceLocation? _selectedLocation;
   bool _addingPlace = false;
 
   void _selectImage(File image) {
@@ -29,14 +30,24 @@ class _AddPlaceScreenState extends State<AddPlaceScreen> {
   }
 
   Future<void> addPlace() async {
-    if (_titleController.text.length < 5 ||
-        _selectedImage == null ||
-        _selectedLocation == null) return;
+    if (_titleController.text.length < 5) {
+      showSnackBar(
+          context, 'Length of the text should be atleast 5 characters long');
+      return;
+    }
+    if (_selectedImage == null) {
+      showSnackBar(context, 'Image not selected');
+      return;
+    }
+    if (_selectedLocation == null) {
+      showSnackBar(context, 'Location not choosen');
+      return;
+    }
     setState(() {
       _addingPlace = true;
     });
     await Provider.of<GreatPlaces>(context, listen: false)
-        .addPlace(_titleController.text, _selectedImage, _selectedLocation);
+        .addPlace(_titleController.text, _selectedImage!, _selectedLocation!);
     setState(() {
       _addingPlace = false;
     });

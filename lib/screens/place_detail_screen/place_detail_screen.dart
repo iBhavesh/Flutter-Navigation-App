@@ -13,7 +13,7 @@ class PlaceDetailScreen extends StatelessWidget {
     final place = Provider.of<GreatPlaces>(context, listen: false).items[index];
     return Scaffold(
       appBar: AppBar(
-        title: Text(place.title),
+        title: Text(place.title!),
       ),
       body: Container(
         child: Column(
@@ -31,17 +31,17 @@ class PlaceDetailScreen extends StatelessWidget {
               child: GestureDetector(
                 onTap: () {
                   Navigator.of(context).push(MaterialPageRoute(
-                      builder: (ctx) => ImageFullScreen(place.image)));
+                      builder: (ctx) => ImageFullScreen(place.image!)));
                 },
                 child: Image.file(
-                  place.image,
+                  place.image!,
                   fit: BoxFit.cover,
                 ),
               ),
             ),
             SizedBox(height: 10),
             Text(
-              place.location.address,
+              place.location!.address!,
               style: TextStyle(fontSize: 20, color: Colors.grey),
               textAlign: TextAlign.center,
             ),
@@ -53,7 +53,7 @@ class PlaceDetailScreen extends StatelessWidget {
                 Navigator.of(context).push(MaterialPageRoute(
                     fullscreenDialog: true,
                     builder: (ctx) => MapScreen(
-                          initialLocation: place.location,
+                          initialLocation: place.location!,
                           isSelecting: false,
                         )));
               },

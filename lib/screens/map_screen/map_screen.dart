@@ -19,7 +19,7 @@ class MapScreen extends StatefulWidget {
 
 class _MapScreenState extends State<MapScreen> {
   Completer<GoogleMapController> _mapController = Completer();
-  LatLng _pickedLocation;
+  LatLng? _pickedLocation;
   void _selectLocation(LatLng position) {
     setState(() {
       _pickedLocation = position;
@@ -47,8 +47,8 @@ class _MapScreenState extends State<MapScreen> {
         },
         initialCameraPosition: CameraPosition(
           target: LatLng(
-            widget.initialLocation.latitude,
-            widget.initialLocation.longitude,
+            widget.initialLocation.latitude!,
+            widget.initialLocation.longitude!,
           ),
           zoom: 16,
         ),
@@ -61,8 +61,8 @@ class _MapScreenState extends State<MapScreen> {
                 Marker(
                   markerId: MarkerId('1'),
                   position: _pickedLocation ??
-                      LatLng(widget.initialLocation.latitude,
-                          widget.initialLocation.longitude),
+                      LatLng(widget.initialLocation.latitude!,
+                          widget.initialLocation.longitude!),
                 ),
               },
       ),

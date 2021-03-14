@@ -12,7 +12,7 @@ class PlacesListScreen extends StatelessWidget {
     try {
       if (await image.exists()) await image.delete();
     } catch (e) {
-      debugPrint(e);
+      debugPrint(e.toString());
     }
     await Provider.of<GreatPlaces>(context, listen: false).deletePlace(id);
   }
@@ -42,14 +42,14 @@ class PlacesListScreen extends StatelessWidget {
                       'No Places Yet! Add Some.',
                       style: TextStyle(fontSize: 24),
                     ),
-                    builder: (context, places, ch) => places.items.length <= 0
-                        ? ch
+                    builder: (context, places, ch) => (places.items.length <= 0)
+                        ? ch!
                         : ListView.builder(
                             itemCount: places.items.length,
                             itemBuilder: (ctx, i) => Dismissible(
                               onDismissed: (direction) {
-                                _deletePlace(places.items[i].id, context,
-                                    places.items[i].image);
+                                _deletePlace(places.items[i].id!, context,
+                                    places.items[i].image!);
                               },
                               key: ValueKey(places.items[i].id),
                               direction: DismissDirection.endToStart,
@@ -83,14 +83,15 @@ class PlacesListScreen extends StatelessWidget {
           children: [
             ListTile(
               leading: CircleAvatar(
-                backgroundImage: places.items[i].image != null
+                foregroundImage: (places.items[i].image == null)
                     ? FileImage(
-                        places.items[i].image,
+                        places.items[i].image!,
                       )
-                    : AssetImage('assets/images/placeholder.png'),
+                    : AssetImage('assets/images/placeholder.png')
+                        as ImageProvider,
               ),
-              title: Text(places.items[i].title),
-              subtitle: Text(places.items[i].location.address),
+              title: Text(places.items[i].title!),
+              subtitle: Text(places.items[i].location!.address!),
             ),
             Divider(
               height: 1,
